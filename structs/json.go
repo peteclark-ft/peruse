@@ -27,6 +27,7 @@ func (b ByAverage) Less(i, j int) bool {
 type Article struct {
 	WebURL string `json:"webUrl"`
 	Score  Score  `json:"score"`
+	List   string `json:"list,omitempty"`
 }
 
 type Score struct {
@@ -79,12 +80,12 @@ func (t *HardestTopResults) Push(article Article) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if article.Score.AutomatedReadability < 3.4 {
+	if article.Score.AutomatedReadability > 16 {
 		return
 	}
 
 	t.Articles = append(t.Articles, article)
-	sort.Sort(ByScore(t.Articles))
+	sort.Sort(sort.Reverse(ByScore(t.Articles)))
 
 	length := len(t.Articles)
 	if length > t.size {
@@ -96,12 +97,12 @@ func (t *EasiestTopResults) Push(article Article) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	if article.Score.AutomatedReadability > 16 {
+	if article.Score.AutomatedReadability < 4 {
 		return
 	}
 
 	t.Articles = append(t.Articles, article)
-	sort.Sort(sort.Reverse(ByScore(t.Articles)))
+	sort.Sort(ByScore(t.Articles))
 
 	length := len(t.Articles)
 	if length > t.size {

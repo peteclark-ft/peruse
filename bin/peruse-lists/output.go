@@ -38,6 +38,7 @@ func processTopResults(top int, records []structs.List) (structs.EasiestTopResul
 
 	for _, record := range records {
 		for _, article := range record.Content {
+			article.List = record.Title
 			easiest.Push(article)
 			hardest.Push(article)
 		}
