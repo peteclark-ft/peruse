@@ -9,6 +9,7 @@ import (
 	"github.com/peteclark-ft/peruse/structs"
 	"github.com/peteclark-ft/peruse/syllables"
 	"github.com/peteclark-ft/peruse/tokenizer"
+	"github.com/peteclark-ft/peruse/xml"
 	"github.com/urfave/cli"
 )
 
@@ -17,15 +18,6 @@ func main() {
 	app.Name = "peruse"
 	app.Usage = "Readability analysis for text content"
 	app.Version = "v0.0.1"
-
-	/*flags := []cli.Flag{
-		cli.StringFlag{
-			Name:  "config",
-			Value: "./config.yml",
-			Usage: "Path to the YAML config file.",
-		},
-	}*/
-	//app.Flags = flags
 
 	app.Action = func(ctx *cli.Context) error {
 		decoder := json.NewDecoder(os.Stdin)
@@ -36,7 +28,12 @@ func main() {
 			return err
 		}
 
-		tokenizer := tokenizer.NewTokenizer(strings.NewReader(uppContent.BodyXML))
+		stripXml, err := xml.ParseBodyXML(strings.NewReader(uppContent.BodyXML))
+		if err != nil {
+			return err
+		}
+
+		tokenizer := tokenizer.NewTokenizer(strings.NewReader(stripXml))
 		content := tokenizer.Tokenize()
 
 		counter := syllables.NewSyllableCounter()
@@ -50,7 +47,8 @@ func main() {
 			return err
 		}
 
-		score := score{
+		score := structs.Score{
+			Raw:                  content.Raw,
 			FleschKincaid:        fk,
 			AutomatedReadability: ar,
 		}
@@ -62,9 +60,4 @@ func main() {
 	}
 
 	app.Run(os.Args)
-}
-
-type score struct {
-	FleschKincaid        float64 `json:"fleschKincaid"`
-	AutomatedReadability float64 `json:"automatedReadability"`
 }

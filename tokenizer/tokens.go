@@ -12,7 +12,7 @@ const (
 )
 
 func isWhitespace(ch rune) bool {
-	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '-'
+	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' || ch == '-' || ch == '—'
 }
 
 func isEndOfSentence(ch rune) bool {

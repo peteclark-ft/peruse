@@ -3,6 +3,7 @@ package tokenizer
 import (
 	"bufio"
 	"bytes"
+	"unicode"
 )
 
 type lexer struct {
@@ -35,8 +36,10 @@ func (l *lexer) Scan() (Token, string) {
 
 	if isEndOfSentence(ch) {
 		l.unread()
-		result := l.readType(isEndOfSentence, isPunctuation)
-		if len(result) == 3 {
+
+		val := l.readType(isEndOfSentence, unicode.IsSpace)
+
+		if len(val) > 1 {
 			return WS, ""
 		}
 

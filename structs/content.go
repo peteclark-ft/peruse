@@ -1,6 +1,7 @@
 package structs
 
 type Content struct {
+	Raw             string
 	TotalWords      int
 	TotalSentences  int
 	TotalCharacters int

@@ -23,6 +23,7 @@ func NewTokenizer(reader io.Reader) ContentTokenizer {
 }
 
 func (t tokenizer) Tokenize() structs.Content {
+	raw := ""
 	content := [][]string{{}}
 
 	for {
@@ -32,6 +33,7 @@ func (t tokenizer) Tokenize() structs.Content {
 		}
 
 		if token == WORD {
+			raw = raw + " " + value
 			currentSentence := content[len(content)-1]
 			content[len(content)-1] = append(currentSentence, value)
 		}
@@ -41,6 +43,7 @@ func (t tokenizer) Tokenize() structs.Content {
 		}
 
 		if token == FULL_STOP {
+			raw = raw + "."
 			content = append(content, []string{})
 		}
 	}
@@ -60,6 +63,7 @@ func (t tokenizer) Tokenize() structs.Content {
 	}
 
 	return structs.Content{
+		Raw:             raw,
 		TotalWords:      totalWords,
 		TotalSentences:  len(sentences),
 		TotalCharacters: totalCharacters,

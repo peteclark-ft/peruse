@@ -78,6 +78,10 @@ func (g getList) requestContent(item listItem) (structs.UPPContent, error) {
 		return uppContent, err
 	}
 
+	if resp.StatusCode != 200 {
+		return uppContent, errors.New("Non-200 status, skipping.")
+	}
+
 	decoder := json.NewDecoder(resp.Body)
 	err = decoder.Decode(&uppContent)
 

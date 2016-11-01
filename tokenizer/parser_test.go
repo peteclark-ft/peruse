@@ -13,6 +13,6 @@ func TestTokenize(t *testing.T) {
 	tt := NewTokenizer(strings.NewReader(expected))
 	content := tt.Tokenize()
 
-	assert.Equal(t, 31, content.TotalSentences)
+	assert.Equal(t, 32, content.TotalSentences)
 	assert.Equal(t, 738, content.TotalWords)
 }

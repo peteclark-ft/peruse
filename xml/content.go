@@ -19,7 +19,7 @@ func ParseBodyXML(reader io.Reader) (string, error) {
 		}
 
 		if tt == html.EndTagToken && z.Token().Data == "p" {
-			if !strings.HasSuffix(content, ".") {
+			if !strings.HasSuffix(strings.TrimSpace(content), ".") {
 				content += "."
 			}
 			continue
