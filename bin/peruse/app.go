@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"os"
 	"strings"
@@ -19,21 +20,28 @@ func main() {
 	app.Usage = "Readability analysis for text content"
 	app.Version = "v0.0.1"
 
-	app.Action = func(ctx *cli.Context) error {
-		decoder := json.NewDecoder(os.Stdin)
+	flags := []cli.Flag{
+		cli.BoolFlag{
+			Name:  "json",
+			Usage: "Is stdin in json content format?",
+		},
+	}
 
-		var uppContent structs.UPPContent
-		err := decoder.Decode(&uppContent)
+	app.Flags = flags
+
+	app.Action = func(ctx *cli.Context) (err error) {
+		var plaintext string
+		if ctx.Bool("json") {
+			plaintext, err = readJSON()
+		} else {
+			plaintext, err = readPlaintext()
+		}
+
 		if err != nil {
 			return err
 		}
 
-		stripXml, err := xml.ParseBodyXML(strings.NewReader(uppContent.BodyXML))
-		if err != nil {
-			return err
-		}
-
-		tokenizer := tokenizer.NewTokenizer(strings.NewReader(stripXml))
+		tokenizer := tokenizer.NewTokenizer(strings.NewReader(plaintext))
 		content := tokenizer.Tokenize()
 
 		counter := syllables.NewSyllableCounter()
@@ -60,4 +68,30 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func readJSON() (string, error) {
+	decoder := json.NewDecoder(os.Stdin)
+
+	var uppContent structs.UPPContent
+	err := decoder.Decode(&uppContent)
+	if err != nil {
+		return "", err
+	}
+
+	stripXML, err := xml.ParseBodyXML(strings.NewReader(uppContent.BodyXML))
+	if err != nil {
+		return "", err
+	}
+
+	return stripXML, nil
+}
+
+func readPlaintext() (string, error) {
+	scanner := bufio.NewScanner(os.Stdin)
+	var plaintext string
+	for scanner.Scan() {
+		plaintext = plaintext + scanner.Text()
+	}
+	return plaintext, nil
 }
